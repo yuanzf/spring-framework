@@ -1,0 +1,17 @@
+package com.yuanzf.ioc;
+
+import org.springframework.stereotype.Component;
+
+/**
+ * @Author: yzf
+ * @Date: 2020/2/19 11:16
+ * @Desoription:
+ */
+@Component("iocBean")
+public class IocBean {
+
+	@Override
+	public String toString(){
+		return "com.yuanzf.ioc.IocBean";
+	}
+}

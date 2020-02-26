@@ -239,6 +239,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected <T> T doGetBean(final String name, @Nullable final Class<T> requiredType,
 			@Nullable final Object[] args, boolean typeCheckOnly) throws BeansException {
 
+		//对bean的名称做处理,在spring中存在两种bean，一种是普通的的bean，一种是factoryBean实现了FactoryBean的接口
+		//当getBean是判断是不是获取factoryBean,如果是要获取factoryBean本身需要在BeanName的前面加上"&"，否在在获取
+		//bean的时候回调用factoryBean的getObject方法，具体见用例com.yuanzf.ioc.factoryBean.FactoryBeanTest
 		final String beanName = transformedBeanName(name);
 		Object bean;
 
@@ -255,17 +258,19 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 			}
 			bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
-		}
-
-		else {
+		} else {
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
+			//原型bean是否正在创建中
 			if (isPrototypeCurrentlyInCreation(beanName)) {
 				throw new BeanCurrentlyInCreationException(beanName);
 			}
 
 			// 检查是否能在当前的beanFactory中取得需要的Bean。如果当前工厂取不到，就到双亲的BeanFactory中去取，
 			//如果当前的双亲工厂取不到，就顺着双亲的beanFactory链一直往上找
+			//类似于责任链模式，先本BeanFactory中查找，本BeanFactory中没有则取父BeanFactory中查找
+			//理解父BeanFactory，这种用法比较少见：在创建ClassPathXmlApplicationContext 时可以传递一个ApplicationContext
+			//这个ApplicationContext就是父BeanFactory
 			BeanFactory parentBeanFactory = getParentBeanFactory();
 			if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
 				// Not found -> check parent.
@@ -273,21 +278,19 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				if (parentBeanFactory instanceof AbstractBeanFactory) {
 					return ((AbstractBeanFactory) parentBeanFactory).doGetBean(
 							nameToLookup, requiredType, args, typeCheckOnly);
-				}
-				else if (args != null) {
+				} else if (args != null) {
 					// Delegation to parent with explicit args.
 					return (T) parentBeanFactory.getBean(nameToLookup, args);
-				}
-				else if (requiredType != null) {
+				} else if (requiredType != null) {
 					// No args -> delegate to standard getBean method.
 					return parentBeanFactory.getBean(nameToLookup, requiredType);
-				}
-				else {
+				} else {
 					return (T) parentBeanFactory.getBean(nameToLookup);
 				}
 			}
-
+			//默认值为false,只有在获取factoryBean的类型时才返回true
 			if (!typeCheckOnly) {
+				//将target bean标记为已创建
 				markBeanAsCreated(beanName);
 			}
 
@@ -306,8 +309,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 									"Circular depends-on relationship between '" + beanName + "' and '" + dep + "'");
 						}
+						//保存Bean之间的依赖关系
 						registerDependentBean(dep, beanName);
 						try {
+							//获取被依赖的Bean
 							getBean(dep);
 						} catch (NoSuchBeanDefinitionException ex) {
 							throw new BeanCreationException(mbd.getResourceDescription(), beanName,
@@ -321,6 +326,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				if (mbd.isSingleton()) {
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
+							//创建Bean
 							return createBean(beanName, mbd, args);
 						}
 						catch (BeansException ex) {
@@ -1389,15 +1395,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			else {
 				return doResolveBeanClass(mbd, typesToMatch);
 			}
-		}
-		catch (PrivilegedActionException pae) {
+		} catch (PrivilegedActionException pae) {
 			ClassNotFoundException ex = (ClassNotFoundException) pae.getException();
 			throw new CannotLoadBeanClassException(mbd.getResourceDescription(), beanName, mbd.getBeanClassName(), ex);
-		}
-		catch (ClassNotFoundException ex) {
+		} catch (ClassNotFoundException ex) {
 			throw new CannotLoadBeanClassException(mbd.getResourceDescription(), beanName, mbd.getBeanClassName(), ex);
-		}
-		catch (LinkageError err) {
+		} catch (LinkageError err) {
 			throw new CannotLoadBeanClassException(mbd.getResourceDescription(), beanName, mbd.getBeanClassName(), err);
 		}
 	}
@@ -1649,7 +1652,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
 
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.
-		if (BeanFactoryUtils.isFactoryDereference(name)) {
+		//不要让普通的Bean依赖工厂Bean否则会抛出异常
+		if (BeanFactoryUtils.isFactoryDereference(name)) {//判断是不是工厂Bean
 			if (beanInstance instanceof NullBean) {
 				return beanInstance;
 			}
@@ -1661,6 +1665,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		// Now we have the bean instance, which may be a normal bean or a FactoryBean.
 		// If it's a FactoryBean, we use it to create a bean instance, unless the
 		// caller actually wants a reference to the factory.
+		//
 		if (!(beanInstance instanceof FactoryBean) || BeanFactoryUtils.isFactoryDereference(name)) {
 			return beanInstance;
 		}

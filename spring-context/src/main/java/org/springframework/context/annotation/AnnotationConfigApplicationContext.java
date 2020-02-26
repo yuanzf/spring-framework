@@ -81,10 +81,17 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * from the given annotated classes and automatically refreshing the context.
 	 * @param annotatedClasses one or more annotated classes,
 	 * e.g. {@link Configuration @Configuration} classes
+	 *
+	 *   创建AnnotationConfigApplicationContext，从annotatedClasses中获得bean的definitions
+	 *   并自动刷新上下（context）
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... annotatedClasses) {
+		//此处会调用父类GenericApplicationContext无参构造方法,设置beanFactory
+		//this.beanFactory = new DefaultListableBeanFactory();
 		this();
+		//注册annotatedClasses，将annotatedClasses注册到BeanDefinition中
 		register(annotatedClasses);
+		//容器启动的重要步骤
 		refresh();
 	}
 
@@ -152,6 +159,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * @see #scan(String...)
 	 * @see #refresh()
 	 */
+	@Override
 	public void register(Class<?>... annotatedClasses) {
 		Assert.notEmpty(annotatedClasses, "At least one annotated class must be specified");
 		this.reader.register(annotatedClasses);
@@ -165,6 +173,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * @see #register(Class...)
 	 * @see #refresh()
 	 */
+	@Override
 	public void scan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		this.scanner.scan(basePackages);
