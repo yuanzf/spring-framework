@@ -270,7 +270,15 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		}
 	}
 
+	/**
+	 *PropertyTokenHolder 主要保存属性的名称，路径，以及集合的Size等信息
+	 *
+	 * @param tokens
+	 * @param pv
+	 * @throws BeansException
+	 */
 	protected void setPropertyValue(PropertyTokenHolder tokens, PropertyValue pv) throws BeansException {
+		//keys主要用来保存集合类型的属性的size
 		if (tokens.keys != null) {
 			processKeyedProperty(tokens, pv);
 		}

@@ -100,74 +100,81 @@ class BeanDefinitionValueResolver {
 	 * @param argName the name of the argument that the value is defined for
 	 * @param value the value object to resolve
 	 * @return the resolved object
+	 * 解析对注入类型的转换
 	 */
 	@Nullable
 	public Object resolveValueIfNecessary(Object argName, @Nullable Object value) {
 		// We must check each value to see whether it requires a runtime reference
 		// to another bean to be resolved.
+		//引用属性的解析
 		if (value instanceof RuntimeBeanReference) {
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
+			//调用引用类型的属性解析方法
 			return resolveReference(argName, ref);
-		}
-		else if (value instanceof RuntimeBeanNameReference) {
+		} else if (value instanceof RuntimeBeanNameReference) {
+			//对属性值是引用容器中另一个Bean名称的解析
 			String refName = ((RuntimeBeanNameReference) value).getBeanName();
 			refName = String.valueOf(doEvaluate(refName));
+			//从容器中获取Bean
 			if (!this.beanFactory.containsBean(refName)) {
 				throw new BeanDefinitionStoreException(
 						"Invalid bean name '" + refName + "' in bean reference for " + argName);
 			}
 			return refName;
-		}
-		else if (value instanceof BeanDefinitionHolder) {
+		} else if (value instanceof BeanDefinitionHolder) {
 			// Resolve BeanDefinitionHolder: contains BeanDefinition with name and aliases.
+			//对Bean类型的属性解析，主要是Bean中的内部内
 			BeanDefinitionHolder bdHolder = (BeanDefinitionHolder) value;
 			return resolveInnerBean(argName, bdHolder.getBeanName(), bdHolder.getBeanDefinition());
-		}
-		else if (value instanceof BeanDefinition) {
+		} else if (value instanceof BeanDefinition) {
 			// Resolve plain BeanDefinition, without contained name: use dummy name.
 			BeanDefinition bd = (BeanDefinition) value;
 			String innerBeanName = "(inner bean)" + BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR +
 					ObjectUtils.getIdentityHexString(bd);
 			return resolveInnerBean(argName, innerBeanName, bd);
-		}
-		else if (value instanceof ManagedArray) {
+		} else if (value instanceof ManagedArray) {
+			//对结合数组类型解析
 			// May need to resolve contained runtime references.
 			ManagedArray array = (ManagedArray) value;
+			//获取数组类型
 			Class<?> elementType = array.resolvedElementType;
 			if (elementType == null) {
+				//获取数组元素类型
 				String elementTypeName = array.getElementTypeName();
 				if (StringUtils.hasText(elementTypeName)) {
 					try {
+						//使用反射机制创建指定类型的对象
 						elementType = ClassUtils.forName(elementTypeName, this.beanFactory.getBeanClassLoader());
 						array.resolvedElementType = elementType;
-					}
-					catch (Throwable ex) {
+					} catch (Throwable ex) {
 						// Improve the message by showing the context.
 						throw new BeanCreationException(
 								this.beanDefinition.getResourceDescription(), this.beanName,
 								"Error resolving array type for " + argName, ex);
 					}
-				}
-				else {
+				} else {
+					//没有获取到数组类型，也没有获取到数组元素类型则直接设置数组的类型为Object
 					elementType = Object.class;
 				}
 			}
+			//创建指定类型的数组
 			return resolveManagedArray(argName, (List<?>) value, elementType);
-		}
-		else if (value instanceof ManagedList) {
+		} else if (value instanceof ManagedList) {
+			//解析List类型属性值
 			// May need to resolve contained runtime references.
 			return resolveManagedList(argName, (List<?>) value);
-		}
-		else if (value instanceof ManagedSet) {
+		} else if (value instanceof ManagedSet) {
+			//解析Set类型属性值
 			// May need to resolve contained runtime references.
 			return resolveManagedSet(argName, (Set<?>) value);
-		}
-		else if (value instanceof ManagedMap) {
+		} else if (value instanceof ManagedMap) {
+			//解析Map类型属性值
 			// May need to resolve contained runtime references.
 			return resolveManagedMap(argName, (Map<?, ?>) value);
-		}
-		else if (value instanceof ManagedProperties) {
+		} else if (value instanceof ManagedProperties) {
+			//解析properties类型属性值,就是key和value都是字符串类型的map
 			Properties original = (Properties) value;
+			//创建一个拷贝，用于解析后的返回值
 			Properties copy = new Properties();
 			original.forEach((propKey, propValue) -> {
 				if (propKey instanceof TypedStringValue) {
@@ -184,31 +191,30 @@ class BeanDefinitionValueResolver {
 				copy.put(propKey, propValue);
 			});
 			return copy;
-		}
-		else if (value instanceof TypedStringValue) {
+		} else if (value instanceof TypedStringValue) {
+			//解析字符串类型属性值
 			// Convert value to target type here.
 			TypedStringValue typedStringValue = (TypedStringValue) value;
 			Object valueObject = evaluate(typedStringValue);
 			try {
+				//获取属性的目标类型
 				Class<?> resolvedTargetType = resolveTargetType(typedStringValue);
 				if (resolvedTargetType != null) {
+					//对目标类型的属性进行解析，递归调用
 					return this.typeConverter.convertIfNecessary(valueObject, resolvedTargetType);
-				}
-				else {
+				} else {
+					//没有获取到属性的目标对象，则返回Object
 					return valueObject;
 				}
-			}
-			catch (Throwable ex) {
+			} catch (Throwable ex) {
 				// Improve the message by showing the context.
 				throw new BeanCreationException(
 						this.beanDefinition.getResourceDescription(), this.beanName,
 						"Error converting typed String value for " + argName, ex);
 			}
-		}
-		else if (value instanceof NullBean) {
+		} else if (value instanceof NullBean) {
 			return null;
-		}
-		else {
+		} else {
 			return evaluate(value);
 		}
 	}
@@ -347,13 +353,16 @@ class BeanDefinitionValueResolver {
 
 	/**
 	 * Resolve a reference to another bean in the factory.
+	 * 引用类型解析
 	 */
 	@Nullable
 	private Object resolveReference(Object argName, RuntimeBeanReference ref) {
 		try {
 			Object bean;
+			//获取Bean的名称
 			String refName = ref.getBeanName();
 			refName = String.valueOf(doEvaluate(refName));
+			//如果引用的对象在父类容器中，则从父类容器中获取指定引用对象
 			if (ref.isToParent()) {
 				if (this.beanFactory.getParentBeanFactory() == null) {
 					throw new BeanCreationException(
@@ -362,9 +371,10 @@ class BeanDefinitionValueResolver {
 							"' in parent factory: no parent factory available");
 				}
 				bean = this.beanFactory.getParentBeanFactory().getBean(refName);
-			}
-			else {
+			} else {
+				//从当前容器中获取指定的Bean对象，如果指定的Bean没有被实例化则会递归出发引用Bean的初始化和依赖注入
 				bean = this.beanFactory.getBean(refName);
+				//
 				this.beanFactory.registerDependentBean(refName, this.beanName);
 			}
 			if (bean instanceof NullBean) {
