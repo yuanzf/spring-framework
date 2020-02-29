@@ -821,11 +821,14 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Trigger initialization of all non-lazy singleton beans...
 		for (String beanName : beanNames) {
+			//获取指定名称Bean的定义
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+			//Bean不是抽象的，单例的并且lazy-init属性为false
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
 				if (isFactoryBean(beanName)) {//如果改Bean是工厂bean则执行以下逻辑
 					//bean工厂类，工厂bean都是以&开头，此处获取工厂bean的名称
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
+					//如果指定的Bean是创建容器的Bean
 					if (bean instanceof FactoryBean) {
 						final FactoryBean<?> factory = (FactoryBean<?>) bean;
 						boolean isEagerInit;
@@ -833,8 +836,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							isEagerInit = AccessController.doPrivileged((PrivilegedAction<Boolean>)
 											((SmartFactoryBean<?>) factory)::isEagerInit,
 									getAccessControlContext());
-						}
-						else {
+						} else {
 							isEagerInit = (factory instanceof SmartFactoryBean &&
 									((SmartFactoryBean<?>) factory).isEagerInit());
 						}
