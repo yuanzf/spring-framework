@@ -245,7 +245,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		final String beanName = transformedBeanName(name);
 		Object bean;
 
-		// 先从缓存中取得bean，处理那些已经被创建过的单间模式的bean，对这种bean的请求不需要重复创建
+		// 先从缓存（singletonObjects）中取得bean，处理那些已经被创建过的单例模式的bean，对这种bean的请求不需要重复创建
+		//当singletonObjects中没有对象是，判断Bean是否可提前暴露，如果可以提前暴露则通过ObjectFactory获取Bean对象，
+		//将将对象设置到earlySingletonObjects中暴露出去
+		//bean的暴露顺序   1.ObjectFactory  ->  earlySingletonObjects   ->  singletonObjects
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
 			if (logger.isTraceEnabled()) {

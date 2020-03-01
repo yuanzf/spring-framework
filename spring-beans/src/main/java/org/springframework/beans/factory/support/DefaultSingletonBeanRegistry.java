@@ -71,17 +71,21 @@ import org.springframework.util.StringUtils;
 public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements SingletonBeanRegistry {
 
 	/** Cache of singleton objects: bean name to bean instance.
-	 * 缓存已创建的Bean实例
+	 * 缓存已创建的Bean实例，此处缓存的Bean实例是已经被赋予值了
 	 * */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
 	/** Cache of singleton factories: bean name to ObjectFactory.
-	 *移除bean单例工厂
+	 *缓存bean单例工厂，当一个Bean已创建但是还未添加到singletonObjects和earlySingletonObjects中时，通过ObjectFactory将Bean暴露出去，
+	 * 主要解决循环依赖关系
 	 * */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 	/** Cache of early singleton objects: bean name to bean instance.
-	 * 缓存提前暴露的bean
+	 * 缓存提前暴露的bean，此时的Bean还未设置属性。
+	 *
+	 * 当一个Bean被允许提前暴露（既属性值还未设置，默认为true。）通过ObjectFactory获取Bean实例保存到earlySingletonObjects中
+	 * 并将对应的ObjectFactory删除
 	 * */
 	private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
