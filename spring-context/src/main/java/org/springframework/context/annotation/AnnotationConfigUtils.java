@@ -235,6 +235,8 @@ public abstract class AnnotationConfigUtils {
 	}
 
 	static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd, AnnotatedTypeMetadata metadata) {
+		//判断metadata中是否有一下注解，如果有则做相应的处理
+		//延迟持久化
 		AnnotationAttributes lazy = attributesFor(metadata, Lazy.class);
 		if (lazy != null) {
 			abd.setLazyInit(lazy.getBoolean("value"));
@@ -246,9 +248,12 @@ public abstract class AnnotationConfigUtils {
 			}
 		}
 
+		//优先注入注解
 		if (metadata.isAnnotated(Primary.class.getName())) {
 			abd.setPrimary(true);
 		}
+
+		//
 		AnnotationAttributes dependsOn = attributesFor(metadata, DependsOn.class);
 		if (dependsOn != null) {
 			abd.setDependsOn(dependsOn.getStringArray("value"));
@@ -297,12 +302,12 @@ public abstract class AnnotationConfigUtils {
 
 		Set<AnnotationAttributes> result = new LinkedHashSet<>();
 
-		// Direct annotation present?
+		// Direct annotation present?  是否有@ComponentScan,有则加入到result中
 		addAttributesIfNotNull(result, metadata.getAnnotationAttributes(annotationClassName, false));
 
-		// Container annotation present?
+		// Container annotation present?  是否有@ComponentScans,有则加入到result中
 		Map<String, Object> container = metadata.getAnnotationAttributes(containerClassName, false);
-		if (container != null && container.containsKey("value")) {
+		if (container != null && container.containsKey("value")) { //将多个ComponentScans拆分为读个ComponentScan
 			for (Map<String, Object> containedAttributes : (Map<String, Object>[]) container.get("value")) {
 				addAttributesIfNotNull(result, containedAttributes);
 			}

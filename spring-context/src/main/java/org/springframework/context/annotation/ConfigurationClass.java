@@ -48,7 +48,7 @@ import org.springframework.util.ClassUtils;
  * @see ConfigurationClassParser
  */
 final class ConfigurationClass {
-
+	//保存了配置类的注解信息
 	private final AnnotationMetadata metadata;
 
 	private final Resource resource;

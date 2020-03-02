@@ -82,7 +82,7 @@ final class PostProcessorRegistrationDelegate {
 			List<BeanDefinitionRegistryPostProcessor> currentRegistryProcessors = new ArrayList<>();
 
 			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.
-			String[] postProcessorNames =
+			String[] postProcessorNames =			//获取配置文件后置处理器.对于内置的后置处理器beanname前都加了internal如org.springframework.context.annotation.internalConfigurationAnnotationProcessor    -> ConfigurationClassPostProcessor
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
 				if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
@@ -90,8 +90,9 @@ final class PostProcessorRegistrationDelegate {
 					processedBeans.add(ppName);
 				}
 			}
-			sortPostProcessors(currentRegistryProcessors, beanFactory);
+			sortPostProcessors(currentRegistryProcessors, beanFactory);//对后置处理器排序
 			registryProcessors.addAll(currentRegistryProcessors);
+			//此处注册了我们所有的Bean
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 			currentRegistryProcessors.clear();
 

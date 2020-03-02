@@ -23,11 +23,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that a bean should be given preference when multiple candidates
- * are qualified to autowire a single-valued dependency. If exactly one
+ * Indicates that a bean should be given preference(优先) when multiple candidates
+ * are qualified(合格) to autowire a single-valued dependency. If exactly one
  * 'primary' bean exists among the candidates, it will be the autowired value.
  *
- * <p>This annotation is semantically equivalent to the {@code <bean>} element's
+ * <p>This annotation is semantically(语义的) equivalent(等效) to the {@code <bean>} element's
  * {@code primary} attribute in Spring XML.
  *
  * <p>May be used on any class directly or indirectly annotated with
@@ -81,6 +81,9 @@ import java.lang.annotation.Target;
  * @see Bean
  * @see ComponentScan
  * @see org.springframework.stereotype.Component
+ *
+ *
+ * 当有多个Bean符合某一个值的自动注入时，有Primary注解的类优先注入
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

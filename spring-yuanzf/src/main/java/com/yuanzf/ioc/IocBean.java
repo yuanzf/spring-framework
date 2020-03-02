@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
  * @Date: 2020/2/19 11:16
  * @Desoription:
  */
-@Component("iocBean")
+@Component
 public class IocBean {
 
 	@Override

@@ -89,9 +89,20 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 		//此处会调用父类GenericApplicationContext无参构造方法,设置beanFactory
 		//this.beanFactory = new DefaultListableBeanFactory();
 		this();
-		//注册annotatedClasses，将annotatedClasses注册到BeanDefinition中
+		/**
+		 * 注册annotatedClasses，将annotatedClasses注册到BeanDefinition中
+		 *		1.首先读取annotatedClasses的类注解，AnnotatedGenericBeanDefinition.metadata东
+		 *		2.设置回调函数，默认为空
+		 *		3.设置配置Bean的范围(默认单例模式)
+		 *		4.自动生成Bean name
+		 *		5.生成BeanDefinitionHolder
+		 *		6.注解配置Bean
+		 */
 		register(annotatedClasses);
-		//容器启动的重要步骤
+		/**
+		 * 容器启动的重要步骤
+		 *
+		 */
 		refresh();
 	}
 
@@ -158,6 +169,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * e.g. {@link Configuration @Configuration} classes
 	 * @see #scan(String...)
 	 * @see #refresh()
+	 *
+	 * 注册配置文件
 	 */
 	@Override
 	public void register(Class<?>... annotatedClasses) {
