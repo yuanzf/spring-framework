@@ -596,7 +596,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// Initialize the bean instance.
-		//Bean对象初始化，依赖注入在此时触发
+		//Bean对象初始化，依赖注入在此时触发,这个exposedObject在初始化处理完以后会返回作为依赖注入完成后的Bean
 		Object exposedObject = bean;
 		try {
 			//将Bean实例对象封装，并且将Bean定义中配置的属性值复制给实例对象
@@ -1318,6 +1318,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		try {
 			Object beanInstance;
 			final BeanFactory parent = this;
+			//默认是使用CglibSubclassingInstantiationStrategy，也就是使用CGLIB来对Bean进行实例化。
 			//获取系统的安全管理接口，JDK标准安全管理API
 			if (System.getSecurityManager() != null) {
 				//匿名内部类，根据实例化策略创建实例对象

@@ -18,7 +18,7 @@ package org.springframework.beans.factory;
 
 /**
  * Extension of the {@link FactoryBean} interface. Implementations may
- * indicate whether they always return independent instances, for the
+ * indicate(表明、指示) whether they always return independent（独立，单独的） instances, for the
  * case where their {@link #isSingleton()} implementation returning
  * {@code false} does not clearly indicate independent instances.
  *
@@ -61,7 +61,7 @@ public interface SmartFactoryBean<T> extends FactoryBean<T> {
 	}
 
 	/**
-	 * Does this FactoryBean expect eager initialization, that is,
+	 * Does this FactoryBean expect eager(渴望，热切) initialization, that is,
 	 * eagerly initialize itself as well as expect eager initialization
 	 * of its singleton object (if any)?
 	 * <p>A standard FactoryBean is not expected to initialize eagerly:

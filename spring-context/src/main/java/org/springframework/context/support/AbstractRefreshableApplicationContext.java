@@ -119,11 +119,12 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * This implementation performs an actual refresh of this context's underlying(潜在的，优先的)
 	 * bean factory, shutting down the previous bean factory (if any) and
 	 * initializing a fresh bean factory for the next phase(阶段) of the context's lifecycle.
+	 *
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
 		if (hasBeanFactory()) {
-			//如果容器已经初始化，销毁容器中的bean，并关闭容器
+			//如果容器已经初始化，销毁容器中的bean，并关闭容器。保证refresh使用的是新建起来的容器。
 			destroyBeans();
 			closeBeanFactory();
 		}
@@ -214,7 +215,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	}
 
 	/**
-	 * Customize the internal bean factory used by this context.
+	 * Customize（定做） the internal bean factory used by this context.
 	 * Called for each {@link #refresh()} attempt.
 	 * <p>The default implementation applies this context's
 	 * {@linkplain #setAllowBeanDefinitionOverriding "allowBeanDefinitionOverriding"}

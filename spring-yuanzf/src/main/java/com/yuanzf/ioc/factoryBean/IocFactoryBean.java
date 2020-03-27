@@ -1,6 +1,6 @@
 package com.yuanzf.ioc.factoryBean;
 
-import com.yuanzf.ioc.IocBean;
+import com.yuanzf.ioc.priority.IocBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * @Date: 2020/2/26 17:10
  * @Desoription:
  */
-@Component("iocFactoryBean")
+//@Component("iocFactoryBean")
 public class IocFactoryBean implements FactoryBean<IocBean> {
 
 	@Override

@@ -54,6 +54,14 @@ import org.springframework.lang.Nullable;
  * @see ConfigurableApplicationContext
  * @see org.springframework.beans.factory.BeanFactory
  * @see org.springframework.core.io.ResourceLoader
+ *
+ * MessageSource：主要支持国际化实现，为开发多语言版本的应用提供服务。
+ * ResourcePatternResolver：访问资源
+ * ApplicationEventPublisher：支持应用事件，这些事件和Bean的生命周期的结合为Bean的管理提供了便利
+ *
+ * Application还提供了附加功能，因此对它的使用是一种面向框架的使用风格。所以在应用开发时使用ApplicationContext作为IoC容器的基本形式。
+ *
+ *
  */
 public interface ApplicationContext extends EnvironmentCapable, ListableBeanFactory, HierarchicalBeanFactory,
 		MessageSource, ApplicationEventPublisher, ResourcePatternResolver {

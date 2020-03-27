@@ -543,7 +543,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			 *
 			 *
 			 * xml加载bean的过程 XmlWebApplicationContext#loadBeanDefinitions(BeanFactory)
-			 * 注解加载Bean的过程 AnnotationConfigWebApplicationContext#loadBeanDefinitions(BeanFactory)
+			 * 注解加载Bean的过程
+			 * @see AnnotationConfigWebApplicationContext#loadBeanDefinitions(BeanFactory)
 			 */
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
@@ -571,6 +572,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Invoke factory processors registered as beans in the context.
 				/**
 				 * 此处调用BeanFactory的后置处理器
+				 * 		用户自定义的Bean也是在此处加载
 				 */
 				invokeBeanFactoryPostProcessors(beanFactory);
 
@@ -582,6 +584,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				 * 实现了PriorityOrdered接口的BeanPostProcessor最先执行
 				 * 实现了Ordered接口辞职，在实现相同类型的接口口可以指定顺序
 				 * 目测是通过@Order注解来指定顺序，这个有待验证
+				 *
+				 *
+				 * 在上一步已经把用户定义的所有的Bean都已经创建出来了，
+				 * 此步骤是从BeanDefinition中获取BeanPostProcessor ,遍历beanFactory中所有的值
 				 */
 				registerBeanPostProcessors(beanFactory);
 
@@ -803,7 +809,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>Must be called before singleton instantiation.
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-		//此处将所有的BeanDefinition添加到BeanFactory的BeanDefinitionMaps中
+		/**
+		 * 此处将所有的BeanDefinition添加到BeanFactory的BeanDefinitionMaps中
+		 */
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
@@ -864,13 +872,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	protected void initApplicationEventMulticaster() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 		if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) {
-			this.applicationEventMulticaster =
-					beanFactory.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, ApplicationEventMulticaster.class);
+			this.applicationEventMulticaster = beanFactory.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, ApplicationEventMulticaster.class);
 			if (logger.isTraceEnabled()) {
 				logger.trace("Using ApplicationEventMulticaster [" + this.applicationEventMulticaster + "]");
 			}
-		}
-		else {
+		} else {
 			this.applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
 			beanFactory.registerSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, this.applicationEventMulticaster);
 			if (logger.isTraceEnabled()) {

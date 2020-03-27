@@ -21,8 +21,10 @@ import java.util.Locale;
 import org.springframework.lang.Nullable;
 
 /**
- * Strategy interface for resolving messages, with support for the parameterization
- * and internationalization of such messages.
+ * Strategy interface for resolving messages, with support for the parameterization（参数化）
+ * and internationalization(国际化) of such messages.
+ *
+ * 主要支持国际化实现，为开发多语言版本的应用提供服务。
  *
  * <p>Spring provides two out-of-the-box implementations for production:
  * <ul>

@@ -1,8 +1,8 @@
 package com.yuanzf;
 
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ComponentScans;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.PriorityOrdered;
 
 /**
  * @Author: yzf
@@ -12,8 +12,11 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan("com.yuanzf.ioc")
-
-public class AppConfig {
+public class AppConfig implements PriorityOrdered {
+	@Override
+	public int getOrder() {
+		return 0;
+	}
 
 	/**
 	 * 1.扫描多个包 @ComponentScans()
@@ -21,4 +24,5 @@ public class AppConfig {
 	 *
 	 * 2.
 	 */
+
 }

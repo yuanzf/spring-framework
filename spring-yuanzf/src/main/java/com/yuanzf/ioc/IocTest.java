@@ -1,6 +1,7 @@
 package com.yuanzf.ioc;
 
 import com.yuanzf.AppConfig;
+import com.yuanzf.AppTestConfig;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**

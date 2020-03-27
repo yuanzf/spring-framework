@@ -1,4 +1,4 @@
-package com.yuanzf.ioc;
+package com.yuanzf.ioc.order;
 
 import org.springframework.stereotype.Component;
 
@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
  * @Date: 2020/2/19 11:16
  * @Desoription:
  */
-@Component
-public class IocBean {
+//@Component
+public class IocOrderBean {
 
 	@Override
 	public String toString(){
-		return "com.yuanzf.ioc.IocBean";
+		return "com.yuanzf.ioc.priority.IocBean";
 	}
 }
