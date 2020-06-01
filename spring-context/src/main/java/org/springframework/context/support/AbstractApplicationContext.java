@@ -1515,7 +1515,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	/**
-	 * Return information about this context.
+	 * Return information about this context.`
 	 */
 	@Override
 	public String toString() {

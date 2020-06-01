@@ -249,6 +249,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		//当singletonObjects中没有对象是，判断Bean是否可提前暴露，如果可以提前暴露则通过ObjectFactory获取Bean对象，
 		//将将对象设置到earlySingletonObjects中暴露出去
 		//bean的暴露顺序   1.ObjectFactory  ->  earlySingletonObjects   ->  singletonObjects
+		//为什么会有这段代码：
+		//因为在创建单例Bean的时候回存在依赖注入情况，而穿在依赖的时候为了避免循环依赖，Spring串讲Bean的原则是不等bean穿件完成就会将创建的Bean的ObjectFactory提早曝光，
+		//也就是将ObjectFactory加入到缓存中，一旦下一个Bean创建的时候依赖上个bean，则直接使用ObjectFactory
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
 			if (logger.isTraceEnabled()) {
@@ -260,6 +263,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					logger.trace("Returning cached instance of singleton bean '" + beanName + "'");
 				}
 			}
+			//返回对应的实例，有时候存在诸如BeanFactory的情况并不是直接返回实例本身而是返回指定方法返回的实例。@see com.yuanzf.ioc.factoryBean.IocFactoryBean，既实现了FactoryBean的接口
 			bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		} else {
 			// Fail if we're already creating this bean instance:
