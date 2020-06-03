@@ -200,19 +200,32 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * <p>Checks already instantiated singletons and also allows for an early
 	 * reference to a currently created singleton (resolving a circular reference).
 	 * @param beanName the name of the bean to look for
-	 * @param allowEarlyReference whether early references should be created or not
+	 * @param allowEarlyReference whether early references should be created or not，是否允许早期依赖
 	 * @return the registered singleton object, or {@code null} if none found
+	 *
+	 * 逻辑：
+	 * 1.去缓存中找，
+	 * 2.缓存没有则判断是否正在创建中，如果正在创建中则不处理
+	 * 3，去earlySingletonObject中找，其中earlySingletonObject和singletonFactory互斥
+	 * 4.去singleFactory中找，如果存在则调用getObject方法获取实例，并将实例信息保存到earlySingletonObject中，同时删除singletonFactories缓存的信息
+	 *
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+		//检查缓存中是否已有实例
 		Object singletonObject = this.singletonObjects.get(beanName);
+		//检查实例是否正在创建中
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {
+				//如果Bean正在加载则不处理
 				singletonObject = this.earlySingletonObjects.get(beanName);
 				if (singletonObject == null && allowEarlyReference) {
+					//当某些方法在需要前提初始化的时候会调用addSingletonFactory方法将对应的ObjectFactory初始化策略存储在singletonFactories中
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					if (singletonFactory != null) {
+						//调用factoryBean的getObject获取实例信息，
 						singletonObject = singletonFactory.getObject();
+						//将实例存储在缓存中；earlySingletonObjects和singletonFactory互斥
 						this.earlySingletonObjects.put(beanName, singletonObject);
 						this.singletonFactories.remove(beanName);
 					}
@@ -356,6 +369,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * Return whether the specified singleton bean is currently in creation
 	 * (within the entire factory).
 	 * @param beanName the name of the bean
+	 *                 检查实例是否正在创建中
 	 */
 	public boolean isSingletonCurrentlyInCreation(String beanName) {
 		return this.singletonsCurrentlyInCreation.contains(beanName);
