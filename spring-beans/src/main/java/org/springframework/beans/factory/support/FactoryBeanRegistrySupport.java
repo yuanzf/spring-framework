@@ -118,13 +118,12 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 							//判断是否在创建中
 							beforeSingletonCreation(beanName);
 							try {
+								//调用ObjectFactory的后处理器（尽可能的保证所有的Bean初始化后都会调用注册的BeanPostProcessor的postProcessAfterInitialization）
 								object = postProcessObjectFromFactoryBean(object, beanName);
-							}
-							catch (Throwable ex) {
+							} catch (Throwable ex) {
 								throw new BeanCreationException(beanName,
 										"Post-processing of FactoryBean's singleton object failed", ex);
-							}
-							finally {
+							} finally {
 								afterSingletonCreation(beanName);
 							}
 						}
@@ -162,23 +161,21 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 
 		Object object;
 		try {
+			//需要权限验证
 			if (System.getSecurityManager() != null) {
 				AccessControlContext acc = getAccessControlContext();
 				try {
 					object = AccessController.doPrivileged((PrivilegedExceptionAction<Object>) factory::getObject, acc);
-				}
-				catch (PrivilegedActionException pae) {
+				} catch (PrivilegedActionException pae) {
 					throw pae.getException();
 				}
-			}
-			else {
+			} else {
+				//如果是FactoryBean则直接调用FactoryBean的getObject方法
 				object = factory.getObject();
 			}
-		}
-		catch (FactoryBeanNotInitializedException ex) {
+		} catch (FactoryBeanNotInitializedException ex) {
 			throw new BeanCurrentlyInCreationException(beanName, ex.toString());
-		}
-		catch (Throwable ex) {
+		} catch (Throwable ex) {
 			throw new BeanCreationException(beanName, "FactoryBean threw exception on object creation", ex);
 		}
 
