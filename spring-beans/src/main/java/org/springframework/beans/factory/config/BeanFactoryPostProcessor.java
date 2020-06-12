@@ -41,6 +41,11 @@ import org.springframework.beans.BeansException;
  * @since 06.07.2003
  * @see BeanPostProcessor
  * @see PropertyResourceConfigurer
+ *
+ * 根BeanPostProcessor类似，可以对Bean的定义（配置元数据）进行处理，springIoc容器允许BeanFactoryPostProcessor在容器实际实例化任何其他的bean
+ * 之前读取配置元数据并修改它。
+ * 可以设置"order"属性来空值BeanFactoryPostProcessor的执行次序，仅当BeanFactory实现了Order接口。
+ * 作用域是容器级别的，
  */
 @FunctionalInterface
 public interface BeanFactoryPostProcessor {

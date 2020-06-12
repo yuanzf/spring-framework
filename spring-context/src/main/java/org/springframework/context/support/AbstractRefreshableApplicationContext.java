@@ -131,9 +131,11 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 		try {
 			//创建IOC容器，返回默认的BeanFactory(DefaultListableBeanFactory)
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
+			//为了序列化指定ID，如果需要的话，让这个BeanFactory从id反序列化到BeanFactory对象
 			beanFactory.setSerializationId(getId());
-			//对IOC容器进行初始化，如设置容器启动参数，开启容器的自动注解等功能
+			//对IOC容器进行初始化，如设置容器启动参数，开启容器的自动注解等功能，
 			//设置Bean是否可被覆盖，设置是否可循环依赖
+			//设置@Autowired和@Qualifier注解解析器QualifierAnnotationAutowireCandidateResolver
 			customizeBeanFactory(beanFactory);
 			//调用载入Bean定义的方法，这里主要使用一个委派模式，
 			// 在当前类中定义了loadBeanDefinitions方法，具体的实现调用子类的容器
@@ -229,9 +231,11 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * @see DefaultListableBeanFactory#setAllowEagerClassLoading
 	 */
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
+		//此地段的含义是：是否允许覆盖同名称的不同定义的对象
 		if (this.allowBeanDefinitionOverriding != null) {
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
+		//是否允许Bean之间循环依赖
 		if (this.allowCircularReferences != null) {
 			beanFactory.setAllowCircularReferences(this.allowCircularReferences);
 		}
