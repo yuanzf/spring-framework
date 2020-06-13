@@ -882,6 +882,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		if (beanDefinition instanceof AbstractBeanDefinition) {
 			try {
+				/*
+				注册前的最后一次检验，这里的检验主要是对AbstractBeanDefinition属性中的methodOverrides校验
+				校验methodOverrides是否与工厂方法并存或者methodOverrides对应的方法根本不存在
+				 */
 				((AbstractBeanDefinition) beanDefinition).validate();
 			} catch (BeanDefinitionValidationException ex) {
 				throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
@@ -894,7 +898,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
 		if (existingDefinition != null) {
 			if (!isAllowBeanDefinitionOverriding()) {
-				//不准被覆盖
+				//如果对应的beanName已经注册，且在配置中配置了bean不准被覆盖，则抛出异常
 				throw new BeanDefinitionOverrideException(beanName, beanDefinition, existingDefinition);
 			} else if (existingDefinition.getRole() < beanDefinition.getRole()) {
 				// e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE
