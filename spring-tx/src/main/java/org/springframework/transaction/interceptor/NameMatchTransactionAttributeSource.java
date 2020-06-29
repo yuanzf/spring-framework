@@ -79,6 +79,7 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 			String value = transactionAttributes.getProperty(methodName);
 			tae.setAsText(value);
 			TransactionAttribute attr = (TransactionAttribute) tae.getValue();
+			//将方法名和事务属性放到map中
 			addTransactionalMethod(methodName, attr);
 		}
 	}
@@ -98,6 +99,13 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 	}
 
 
+	/**
+	 * 对方法进行判断，判断它是否是事务方法，如果是事务方法则取出相应的事务配置属性
+	 * @param method the method to introspect
+	 * @param targetClass the target class (may be {@code null},
+	 * in which case the declaring class of the method must be used)
+	 * @return
+	 */
 	@Override
 	@Nullable
 	public TransactionAttribute getTransactionAttribute(Method method, @Nullable Class<?> targetClass) {
@@ -105,10 +113,12 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 			return null;
 		}
 
+		//判断当前方法与配置的事务方法是否直接匹配，
 		// Look for direct name match.
 		String methodName = method.getName();
 		TransactionAttribute attr = this.nameMap.get(methodName);
 
+		//如果不直接匹配，就通过调用PatternMatchUtils的simpleMatch方法来进行匹配
 		if (attr == null) {
 			// Look for most specific name match.
 			String bestNameMatch = null;

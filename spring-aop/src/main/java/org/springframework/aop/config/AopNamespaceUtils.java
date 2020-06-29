@@ -53,8 +53,7 @@ public abstract class AopNamespaceUtils {
 	private static final String EXPOSE_PROXY_ATTRIBUTE = "expose-proxy";
 
 
-	public static void registerAutoProxyCreatorIfNecessary(
-			ParserContext parserContext, Element sourceElement) {
+	public static void registerAutoProxyCreatorIfNecessary(ParserContext parserContext, Element sourceElement) {
 
 		BeanDefinition beanDefinition = AopConfigUtils.registerAutoProxyCreatorIfNecessary(
 				parserContext.getRegistry(), parserContext.extractSource(sourceElement));
