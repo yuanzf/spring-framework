@@ -31,9 +31,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * Proxy factory bean for simplified declarative transaction handling.
- * This is a convenient alternative to a standard AOP
+ * This is a convenient(方便) alternative to a standard AOP
  * {@link org.springframework.aop.framework.ProxyFactoryBean}
- * with a separate {@link TransactionInterceptor} definition.
+ * with a separate（分离） {@link TransactionInterceptor} definition.
  *
  * <p><strong>HISTORICAL NOTE:</strong> This class was originally designed to cover the
  * typical case of declarative transaction demarcation: namely, wrapping a singleton
@@ -80,25 +80,25 @@ import org.springframework.transaction.PlatformTransactionManager;
  * This reduces the per-bean definition effort to a minimum.
  *
  * <pre code="class">
- * &lt;bean id="baseTransactionProxy" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
- *     abstract="true"&gt;
- *   &lt;property name="transactionManager" ref="transactionManager"/&gt;
- *   &lt;property name="transactionAttributes"&gt;
- *     &lt;props&gt;
- *       &lt;prop key="insert*"&gt;PROPAGATION_REQUIRED&lt;/prop&gt;
- *       &lt;prop key="update*"&gt;PROPAGATION_REQUIRED&lt;/prop&gt;
- *       &lt;prop key="*"&gt;PROPAGATION_REQUIRED,readOnly&lt;/prop&gt;
- *     &lt;/props&gt;
- *   &lt;/property&gt;
- * &lt;/bean&gt;
+ * <bean id="baseTransactionProxy" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" abstract="true">
+ *   <property name="transactionManager" ref="transactionManager"/>
+ *   <property name="transactionAttributes">
+ *     <props>
+ *       <prop key="insert*">PROPAGATION_REQUIRED</prop>
+ *       <prop key="update*">PROPAGATION_REQUIRED</prop>
+ *       <prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+ *     </props>
+ *   </property>
+ * </bean>
  *
- * &lt;bean id="myProxy" parent="baseTransactionProxy"&gt;
- *   &lt;property name="target" ref="myTarget"/&gt;
- * &lt;/bean&gt;
+ * <bean id="myProxy" parent="baseTransactionProxy">
+ *   <property name="target" ref="myTarget"/>
+ * </bean>
  *
- * &lt;bean id="yourProxy" parent="baseTransactionProxy"&gt;
- *   &lt;property name="target" ref="yourTarget"/&gt;
- * &lt;/bean&gt;</pre>
+ * <bean id="yourProxy" parent="baseTransactionProxy">
+ *   <property name="target" ref="yourTarget"/>
+ * </bean>
+ * </pre>
  *
  * @author Juergen Hoeller
  * @author Dmitriy Kopylenko
@@ -115,6 +115,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBean
 		implements BeanFactoryAware {
 
+	/**
+	 *这个拦截器TransactionInterceptor通过AOP发挥作用，通过这个拦截器，Spring封装了事务处理实现
+	 */
 	private final TransactionInterceptor transactionInterceptor = new TransactionInterceptor();
 
 	@Nullable
@@ -122,6 +125,7 @@ public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBe
 
 
 	/**
+	 * 通过依赖注入的PlatformTransactionManager
 	 * Set the default transaction manager. This will perform actual
 	 * transaction management: This class is just a way of invoking it.
 	 * @see TransactionInterceptor#setTransactionManager
@@ -131,6 +135,8 @@ public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBe
 	}
 
 	/**
+	 * 通过依赖注入的事务属性以Properties的形式出现
+	 * 把BeanDefinitin中读取到的事务管理的属性信息注入TransactionInterceptor中
 	 * Set properties with method names as keys and transaction attribute
 	 * descriptors (parsed via TransactionAttributeEditor) as values:
 	 * e.g. key = "myMethod", value = "PROPAGATION_REQUIRED,readOnly".
@@ -188,14 +194,17 @@ public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBe
 
 	/**
 	 * Creates an advisor for this FactoryBean's TransactionInterceptor.
+	 * 这里创建Spring AOP对事物处理的Advisor
 	 */
 	@Override
 	protected Object createMainInterceptor() {
 		this.transactionInterceptor.afterPropertiesSet();
 		if (this.pointcut != null) {
+			//这里使用默认的通知器DefaultPointcutAdvisor,并为通知器配置事务处理拦截器
 			return new DefaultPointcutAdvisor(this.pointcut, this.transactionInterceptor);
 		} else {
 			// Rely on default pointcut.
+			//如果没有配置Pointcut，使用TransactionAttributeSourceAdvisor作为通知器，并为通知器设置TransactionInterceptor作为拦截器
 			return new TransactionAttributeSourceAdvisor(this.transactionInterceptor);
 		}
 	}

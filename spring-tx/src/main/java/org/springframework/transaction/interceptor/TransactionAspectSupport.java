@@ -305,7 +305,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 			try {
 				// This is an around advice: Invoke the next interceptor in the chain.
 				// This will normally result in a target object being invoked.
-				//这里的调用使用处理沿着烂机器链进行，使最后的目标对象的方法得到调用
+				//这里的调用使用处理沿着拦截器链进行，使最后的目标对象的方法得到调用
 				retVal = invocation.proceedWithInvocation();
 			} catch (Throwable ex) {
 				// target invocation exception

@@ -26,6 +26,8 @@ import org.springframework.lang.Nullable;
  * <p>Implementations know how to source transaction attributes, whether from configuration,
  * metadata attributes at source level (such as Java 5 annotations), or anywhere else.
  *
+ *
+ *
  * @author Rod Johnson
  * @since 15.04.2003
  * @see TransactionInterceptor#setTransactionAttributeSource

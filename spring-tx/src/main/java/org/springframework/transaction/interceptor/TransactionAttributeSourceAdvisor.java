@@ -25,12 +25,17 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Advisor driven by a {@link TransactionAttributeSource}, used to include
+ * Advisor(通知器) driven by a {@link TransactionAttributeSource}, used to include
  * a {@link TransactionInterceptor} only for methods that are transactional.
  *
- * <p>Because the AOP framework caches advice calculations, this is normally
+ * <p>Because the AOP framework caches advice calculations(计算), this is normally
  * faster than just letting the TransactionInterceptor run and find out
  * itself that it has no work to do.
+ *
+ * Spring使用这个通知器来完成对事务处理属性值的处理
+ * 处理的结果是：
+ * 在IoC容器中配置的书屋处理属性的信息，会被读入并转化成TransactionAttribute表示的数据对象，这个数据对象是对Spring对事务处理属性值的数据抽象，对这些属性的处理是和
+ * TransactionProxyFactoryBean拦截下来的书屋方法的处理结合起来
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -43,6 +48,7 @@ public class TransactionAttributeSourceAdvisor extends AbstractPointcutAdvisor {
 	@Nullable
 	private TransactionInterceptor transactionInterceptor;
 
+	//这里通过TransactionInterceptor来得到事务的属性配置，在对proxy的方法进行匹配时会调用到这些匹配属性
 	private final TransactionAttributeSourcePointcut pointcut = new TransactionAttributeSourcePointcut() {
 		@Override
 		@Nullable

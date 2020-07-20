@@ -3,6 +3,7 @@ package com.yuanzf;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.PriorityOrdered;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * @Author: yzf
@@ -12,6 +13,7 @@ import org.springframework.core.PriorityOrdered;
 
 @Configuration
 @ComponentScan("com.yuanzf.ioc")
+@EnableTransactionManagement
 public class AppConfig implements PriorityOrdered {
 	@Override
 	public int getOrder() {

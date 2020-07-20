@@ -1,7 +1,6 @@
 package com.yuanzf.ioc;
 
 import com.yuanzf.AppConfig;
-import com.yuanzf.AppTestConfig;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
@@ -13,8 +12,6 @@ public class IocTest {
 
 	public static void main(String[] args) {
 		AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
-		Object normalBean = annotationConfigApplicationContext.getBean("iocBean");
-		System.out.println(normalBean);
 
 	}
 }

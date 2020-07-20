@@ -35,7 +35,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * @see Ejb3TransactionAnnotationParser
  * @see JtaTransactionAnnotationParser
  */
-public interface TransactionAnnotationParser {
+public interface /**/TransactionAnnotationParser {
 
 	/**
 	 * Parse the transaction attribute for the given method or class,

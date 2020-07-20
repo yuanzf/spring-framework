@@ -106,7 +106,7 @@ class BeanDefinitionValueResolver {
 	public Object resolveValueIfNecessary(Object argName, @Nullable Object value) {
 		// We must check each value to see whether it requires a runtime reference
 		// to another bean to be resolved.
-		//引用属性的解析
+		//引用属性的解析,RuntimeBeanReference是在对BeanDefinition进行解析时生成的数据对象
 		if (value instanceof RuntimeBeanReference) {
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
 			//调用引用类型的属性解析方法
@@ -381,8 +381,7 @@ class BeanDefinitionValueResolver {
 				bean = null;
 			}
 			return bean;
-		}
-		catch (BeansException ex) {
+		} catch (BeansException ex) {
 			throw new BeanCreationException(
 					this.beanDefinition.getResourceDescription(), this.beanName,
 					"Cannot resolve reference to bean '" + ref.getBeanName() + "' while setting " + argName, ex);

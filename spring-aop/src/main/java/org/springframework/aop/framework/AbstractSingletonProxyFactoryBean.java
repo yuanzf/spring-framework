@@ -151,7 +151,7 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 		}
 
 		//TransactionProxyFactoryBean使用ProxyFactory完成AOP功能
-		//ProxyFactory提供proxy对象，并将TransactionInterceptor设置为target方法调用的烂机器
+		//ProxyFactory提供proxy对象，并将TransactionInterceptor设置为target方法调用的拦截器
 		ProxyFactory proxyFactory = new ProxyFactory();
 
 		if (this.preInterceptors != null) {
@@ -160,9 +160,9 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 			}
 		}
 
-		// Add the main interceptor (typically an Advisor).
+		// Add the main interceptor (typically an Advisor).(重要方法)
 		//这里是Spring加入通知器的地方，可以加入两种通知器，分别是DefaultPointcutAdvisor和TransactionAttributeSourceAdvisor
-		//通过createMainInterceptor()来生成，Advisor.
+		//通过TransactionProxyFactoryBean.createMainInterceptor()来生成Advisor.
 		//在proxyFactory的基类中ProxyCreatorSupport中维护了一个LinkedList，用来管理配置给ProxyFactory的通知器
 		proxyFactory.addAdvisor(this.advisorAdapterRegistry.wrap(createMainInterceptor()));
 
@@ -204,8 +204,7 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 	protected TargetSource createTargetSource(Object target) {
 		if (target instanceof TargetSource) {
 			return (TargetSource) target;
-		}
-		else {
+		} else {
 			return new SingletonTargetSource(target);
 		}
 	}
